@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
   AlertTriangle,
   ArrowDown,
@@ -31,7 +32,6 @@ import type { RoutePlanResponse } from "@/types/routes";
 import FleetDashboard from "@/components/FleetDashboard";
 import WeatherRiskAlertCenter from "@/components/WeatherRiskAlertCenter";
 import { saveRoutePlan } from "@/lib/routePlanStore";
-import RouteAssistant from "@/components/RouteAssistant";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), {
   ssr: false,
@@ -44,7 +44,6 @@ const RouteMap = dynamic(() => import("@/components/RouteMap"), {
 
 type TabId = "overview" | "routes" | "fleet";
 
-/* ---------- Risk tokens: pill (text+bg) and dot colour ---------- */
 const riskStyles: Record<string, string> = {
   low: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   moderate: "bg-amber-50 text-amber-800 ring-amber-600/20",
@@ -91,14 +90,12 @@ function formatDateTime(value: string) {
   );
 }
 
-/* ---------- Shared style tokens ---------- */
 const eyebrow =
   "text-[10px] font-semibold uppercase tracking-wider text-slate-500";
 
 const fieldClass =
   "mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-none transition hover:border-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
 
-/* ---------- Small presentational helpers ---------- */
 function RiskPill({
   risk,
   label,
@@ -206,6 +203,12 @@ function SkeletonBlock({ className = "" }: { className?: string }) {
 }
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [origin, setOrigin] = useState<LocationSuggestion | null>({
     label: "Manali, Himachal Pradesh, India",
     latitude: 32.2432,
@@ -285,6 +288,7 @@ export default function Home() {
       });
 
       setResult(response);
+
       saveRoutePlan({
         result: response,
         originLabel: origin.label,
@@ -292,6 +296,7 @@ export default function Home() {
         intervalMiles: interval,
         savedAt: new Date().toISOString(),
       });
+
       setTab("overview");
       setSelectedRouteId(
         response.recommended_route_id ?? response.routes[0]?.route_id ?? null,
@@ -313,7 +318,6 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-400 antialiased">
-      {/* Page header (global header and navigation live in AppShell) */}
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-medium text-slate-500">
@@ -341,7 +345,6 @@ export default function Home() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
-        {/* Configuration */}
         <aside className="h-fit xl:sticky xl:top-24">
           <Panel
             title="Trip configuration"
@@ -403,7 +406,6 @@ export default function Home() {
                 </label>
               </div>
 
-              {/* Advanced options: collapsed to keep the form short */}
               <details className="group/adv rounded-lg border border-slate-200 bg-slate-50">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
                   <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
@@ -423,7 +425,6 @@ export default function Home() {
                 </summary>
 
                 <div className="space-y-5 border-t border-slate-200 p-4">
-                  {/* Forecast horizon slider */}
                   <div>
                     <div className="flex items-center justify-between gap-3">
                       <label
@@ -471,10 +472,12 @@ export default function Home() {
                     <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-white px-3 py-2">
                       <p className="text-xs text-slate-500">Forecast time</p>
                       <p className="text-xs font-medium tabular-nums text-slate-900">
-                        {previewForecastTime &&
-                        !Number.isNaN(previewForecastTime.getTime())
-                          ? formatDateTime(previewForecastTime.toISOString())
-                          : "Select a departure time"}
+                        {!mounted
+                          ? "Loading forecast time..."
+                          : previewForecastTime &&
+                              !Number.isNaN(previewForecastTime.getTime())
+                            ? formatDateTime(previewForecastTime.toISOString())
+                            : "Select a departure time"}
                       </p>
                     </div>
                   </div>
@@ -539,7 +542,6 @@ export default function Home() {
           </Panel>
         </aside>
 
-        {/* Results */}
         <section className="min-w-0 space-y-5">
           {!result && !loading && (
             <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8">
@@ -624,7 +626,6 @@ export default function Home() {
 
           {result && (
             <>
-              {/* Section tabs keep the page to one focused view at a time */}
               <div
                 role="tablist"
                 aria-label="Route analysis sections"
@@ -661,7 +662,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* ---------- Overview ---------- */}
               {tab === "overview" && (
                 <div
                   role="tabpanel"
@@ -712,7 +712,6 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* RouteMap renders its own header and route selector */}
                   <RouteMap
                     routes={result.routes}
                     recommendedRouteId={result.recommended_route_id}
@@ -722,7 +721,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* ---------- Route details ---------- */}
               {tab === "routes" && (
                 <div
                   role="tabpanel"
@@ -961,7 +959,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* ---------- Fleet & alerts ---------- */}
               {tab === "fleet" && (
                 <div
                   role="tabpanel"
