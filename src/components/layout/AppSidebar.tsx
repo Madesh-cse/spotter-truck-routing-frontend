@@ -1,10 +1,10 @@
-
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  Bot,
   CloudLightning,
   LayoutDashboard,
   MapPin,
@@ -45,12 +45,14 @@ const navigation = [
     href: "/analytics",
     icon: BarChart3,
   },
+  {
+    label: "Route Assistant",
+    href: "/route-assistant",
+    icon: Bot,
+  },
 ];
 
-export default function AppSidebar({
-  mobileOpen,
-  onClose,
-}: AppSidebarProps) {
+export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (

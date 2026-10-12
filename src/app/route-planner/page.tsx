@@ -31,6 +31,7 @@ import type { RoutePlanResponse } from "@/types/routes";
 import FleetDashboard from "@/components/FleetDashboard";
 import WeatherRiskAlertCenter from "@/components/WeatherRiskAlertCenter";
 import { saveRoutePlan } from "@/lib/routePlanStore";
+import RouteAssistant from "@/components/RouteAssistant";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), {
   ssr: false,
