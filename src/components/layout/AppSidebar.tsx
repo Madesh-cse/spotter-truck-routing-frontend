@@ -140,19 +140,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
         </nav>
 
         <div className="border-t border-slate-200 p-4">
-          <Link
-            href="/settings"
-            onClick={onClose}
-            className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
-              pathname === "/settings"
-                ? "bg-blue-50 text-blue-700"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-            }`}
-          >
-            <Settings size={19} className="text-slate-400" />
-            Settings
-          </Link>
-
           <div className="mt-4 rounded-xl bg-slate-50 p-3">
             <p className="text-xs font-semibold text-slate-700">
               Weather-aware routing
